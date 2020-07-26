@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import ke.axle.chassis.annotations.*;
+import ke.axle.chassis.entity.base.StandardEntity;
 import ke.axle.chassis.enums.ModifiableFieldType;
 import ke.axle.chassis.exceptions.ExpectationFailed;
 import ke.axle.chassis.wrappers.ConstantsWrapper;
@@ -50,7 +51,7 @@ import java.util.*;
  * @author Owori Juma
  * @version 1.2.3
  */
-public class SupportRepository<T, E> {
+public class SupportRepository<T extends StandardEntity, E> {
 
     /**
      * Used to handle logging mainly to the console but you can implement an appender for more options
@@ -95,27 +96,15 @@ public class SupportRepository<T, E> {
     public List<String> handleEditRequest(T entity, T oldEntity, Class<E> editEntity) throws
             IllegalAccessException, JsonProcessingException, ExpectationFailed {
 
-        Serializable index = null;
+
         List<String> changes = new ArrayList<>();
 
         if (null != entity) {
-            //Check if entity has been modified
-            for (Field field : entity.getClass().getDeclaredFields()) {
-                if (!field.isAccessible()) {
-                    field.setAccessible(true);
-                }
-                if (field.isAnnotationPresent(Id.class)) {
-                    index = (Serializable) field.get(entity);
-                }
-            }
-            if (index == null) {
-                log.warn("Failed to find id field on entity {} during handling edit request", entity);
-            } else {
-                changes = this.fetchChanges(entity, oldEntity);
-                //If there are changes, update this field
-                if (!changes.isEmpty()) {
-                    updateChanges(index, entity, oldEntity, editEntity);
-                }
+
+            changes = this.fetchChanges(entity, oldEntity);
+            //If there are changes, update this field
+            if (!changes.isEmpty()) {
+                updateChanges(entity.getId(), entity, oldEntity, editEntity);
             }
         }
 
@@ -125,7 +114,7 @@ public class SupportRepository<T, E> {
     public String getBeforeAndAfterValues(T oldEntity, T newEntity) {
         String beforeValues = "Before : [";
         PropertyAccessor oldAccessor = PropertyAccessorFactory.forBeanPropertyAccess(oldEntity);
-        for (Field field : oldEntity.getClass().getDeclaredFields()) {
+        for (Field field : Extractor.getAllFields(oldEntity.getClass())) {
             if (field.isAnnotationPresent(ModifiableField.class)) {
                 if (oldAccessor.getPropertyValue(field.getName()) != null) {
                     beforeValues += field.getName() + " - " + oldAccessor.getPropertyValue(field.getName()) + ", ";
@@ -134,7 +123,7 @@ public class SupportRepository<T, E> {
         }
         String afterValues = "After : [";
         PropertyAccessor newAccessor = PropertyAccessorFactory.forBeanPropertyAccess(newEntity);
-        for (Field field : newEntity.getClass().getDeclaredFields()) {
+        for (Field field : Extractor.getAllFields(newEntity.getClass())) {
             if (field.isAnnotationPresent(ModifiableField.class)) {
                 afterValues += field.getName() + " - " + newAccessor.getPropertyValue(field.getName()) + ", ";
             }
@@ -151,7 +140,7 @@ public class SupportRepository<T, E> {
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         //ignore entities
         Set<String> ignoreProperties = new HashSet<>();
-        for (Field field : oldEntity.getClass().getDeclaredFields()) {
+        for (Field field : Extractor.getAllFields(oldEntity.getClass())) {
             if (field.isAnnotationPresent(OneToMany.class) || field.isAnnotationPresent(ManyToOne.class)) {
                 ignoreProperties.add(field.getName());
             }
@@ -165,7 +154,7 @@ public class SupportRepository<T, E> {
         CriteriaDelete c = this.builder.createCriteriaDelete(editEntity);
         Root criteriaRoot = c.from(editEntity);
         Predicate[] preds = new Predicate[2];
-        for (Field field : editEntity.getDeclaredFields()) {
+        for (Field field : Extractor.getAllFields(editEntity)) {
             if (field.isAnnotationPresent(EditEntity.class)) {
                 wrapper.setPropertyValue(field.getName(), entity.getClass().getSimpleName());
                 preds[0] = this.builder.equal(criteriaRoot.get(field.getName()), entity.getClass().getSimpleName());
@@ -211,7 +200,7 @@ public class SupportRepository<T, E> {
             return changes;
         }
 
-        final Field[] allFields = oldbean.getClass().getDeclaredFields();
+        final List<Field> allFields = Extractor.getAllFields(oldbean.getClass());
         for (Field field : allFields) {
             //Manage the fields that we need only
             if (field.isAnnotationPresent(ModifiableField.class)) {
@@ -314,7 +303,7 @@ public class SupportRepository<T, E> {
         }
 
         PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(entityName);
-        for (Field field : entityName.getDeclaredFields()) {
+        for (Field field : Extractor.getAllFields(entityName)) {
             if (field.isAnnotationPresent(Id.class)) {
                 idField = field.getName();
                 hasId = true;
@@ -391,7 +380,7 @@ public class SupportRepository<T, E> {
         Root criteriaRoot = c.from(editedEnClazz);
         Predicate[] preds = new Predicate[2];
 
-        for (Field field : editedEnClazz.getDeclaredFields()) {
+        for (Field field : Extractor.getAllFields(editedEnClazz)) {
             if (field.isAnnotationPresent(EditEntity.class)) {
                 log.debug("Adding restriction for field {} value {}", field.getName(), this.entityClazz.getSimpleName());
                 preds[0] = this.builder.equal(criteriaRoot.get(field.getName()), this.entityClazz.getSimpleName());
@@ -439,32 +428,15 @@ public class SupportRepository<T, E> {
      * param id entity id
      * return persistent context entity
      */
-    public T fetchEntity(Serializable id) {
-        //get id field name
-        String fieldId = null;
-        boolean hasIntrash = false;
-        for (Field field : entityClazz.getDeclaredFields()) {
-            if (field.isAnnotationPresent(Id.class)) {
-                fieldId = field.getName();
-            }
-            if (field.getName().equalsIgnoreCase("intrash")) {
-                hasIntrash = true;
-            }
-        }
-
-        if (fieldId == null) {
-            throw new RuntimeException("Entity doesn't have an id field");
-        }
+    public T fetchEntity(E id) {
 
         CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(entityClazz);
         Root<T> root = criteriaQuery.from(entityClazz);
-        if (hasIntrash) {
-            criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(root.get(fieldId), id),
-                    criteriaBuilder.equal(root.get("intrash"), AppConstants.NO)));
-        } else {
-            criteriaQuery.where(criteriaBuilder.equal(root.get(fieldId), id));
-        }
+
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(root.get("id"), id),
+                criteriaBuilder.isNull(root.get("deleteTs"))));
+
         try {
             return this.entityManager.createQuery(criteriaQuery).getSingleResult();
         } catch (javax.persistence.NoResultException ex) {
@@ -476,14 +448,14 @@ public class SupportRepository<T, E> {
      * Used to merge entity from Storage. Updates new values from edited record
      * to the provided entity
      */
-    public T mergeChanges(Serializable id, T t) throws IOException, IllegalArgumentException, IllegalAccessException {
+    public T mergeChanges(E id, T t) throws IOException, IllegalArgumentException, IllegalAccessException {
 
         String data, dataField = null;
         CriteriaQuery<E> c = this.builder.createQuery(editedEnClazz);
         Root criteriaRoot = c.from(editedEnClazz);
         Predicate[] preds = new Predicate[2];
 
-        for (Field field : editedEnClazz.getDeclaredFields()) {
+        for (Field field : Extractor.getAllFields(editedEnClazz)) {
             if (field.isAnnotationPresent(EditEntity.class)) {
                 preds[0] = this.builder.equal(criteriaRoot.get(field.getName()), this.entityClazz.getSimpleName());
             } else if (field.isAnnotationPresent(EditEntityId.class)) {
@@ -541,7 +513,7 @@ public class SupportRepository<T, E> {
      * {link ModifiableField} is not accessible
      */
     public T updateEdit(T newbean, T oldbean) throws IllegalAccessException {
-        final Field[] allFields = newbean.getClass().getDeclaredFields();
+        final List<Field> allFields = Extractor.getAllFields(newbean.getClass());
         BeanWrapper wrapper = new BeanWrapperImpl(oldbean);
         for (Field field : allFields) {
             //Manage the fields that we need only
@@ -590,7 +562,7 @@ public class SupportRepository<T, E> {
         Root criteriaRoot = c.from(editedEnClazz);
         Predicate[] preds = new Predicate[2];
 
-        for (Field field : editedEnClazz.getDeclaredFields()) {
+        for (Field field : Extractor.getAllFields(editedEnClazz)) {
             if (field.isAnnotationPresent(EditEntity.class)) {
                 preds[0] = this.builder.equal(criteriaRoot.get(field.getName()), this.entityClazz.getSimpleName());
             } else if (field.isAnnotationPresent(EditEntityId.class)) {
@@ -613,19 +585,12 @@ public class SupportRepository<T, E> {
 
     public List<String> handleEditRequestChild(T entity, T oldEntity, Class<E> editEntity) throws
             IllegalAccessException, JsonProcessingException, ExpectationFailed {
-        Serializable index = null;
         List<String> changes = new ArrayList<>();
 
         if (null != entity) {
-            //Check if entity has been modified
-            for (Field field : entity.getClass().getDeclaredFields()) {
-                if (!field.isAccessible()) {
-                    field.setAccessible(true);
-                }
-                if (field.isAnnotationPresent(Id.class)) {
-                    index = (Serializable) field.get(entity);
-                }
-            }
+
+            Serializable index = entity.getId();
+
             if (index == null) {
                 log.warn("Failed to find id field on entity {} during handling edit request", entity);
             } else {

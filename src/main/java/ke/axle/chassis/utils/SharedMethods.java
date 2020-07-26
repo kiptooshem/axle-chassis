@@ -258,7 +258,9 @@ public class SharedMethods {
     public static List<Class> getGenericClasses(Class clazz) {
         List<Class> classes = new ArrayList<>();
         ParameterizedType t = (ParameterizedType) clazz.getGenericSuperclass();
+        System.out.println("ParameterizedType: " + t);
         for (Type type : t.getActualTypeArguments()) {
+            System.out.println("ParameterizedType: Type : " + type);
             classes.add((Class<?>) type);
         }
         return classes;

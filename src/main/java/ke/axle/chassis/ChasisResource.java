@@ -10,6 +10,9 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import io.swagger.annotations.*;
 import ke.axle.chassis.annotations.*;
+import ke.axle.chassis.entity.base.StandardEntity;
+import ke.axle.chassis.entity.enums.MakerCheckerAction;
+import ke.axle.chassis.entity.enums.MakerCheckerActionStatus;
 import ke.axle.chassis.exceptions.ExpectationFailed;
 import ke.axle.chassis.exceptions.GeneralBadRequest;
 import ke.axle.chassis.utils.*;
@@ -37,10 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -64,7 +64,7 @@ import java.util.*;
  * @author Owori Juma
  * @version 1.2.3
  */
-public class ChasisResource<T, E extends Serializable, R> {
+public class ChasisResource<T extends StandardEntity, E extends Serializable, R> {
 
     /**
      * Used to handling logging requests
@@ -118,8 +118,8 @@ public class ChasisResource<T, E extends Serializable, R> {
         ResponseWrapper response = new ResponseWrapper();
         //check if relational entities exists
         PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(t);
-        for (Field field : t.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(Id.class) && !field.isAnnotationPresent(ChasisUUID.class)) {
+        for (Field field : Extractor.getAllFields(t.getClass())) {  // Get all fields in the hierachy
+            /*if (field.isAnnotationPresent(Id.class) && !field.isAnnotationPresent(ChasisUUID.class)) {
                 accessor.setPropertyValue(field.getName(), null);
             }
             if (field.isAnnotationPresent(Id.class) && field.isAnnotationPresent(ChasisUUID.class)) {
@@ -129,11 +129,13 @@ public class ChasisResource<T, E extends Serializable, R> {
                     log.error("Error ", e.getCause());
                     accessor.setPropertyValue(field.getName(), null);
                 }
-            }
+            }*/
+
+            // TODO: Check this one out
             if (field.isAnnotationPresent(ManyToOne.class)) {
                 Object relEntity = accessor.getPropertyValue(field.getName());
                 if (relEntity != null) {
-                    for (Field f2 : relEntity.getClass().getDeclaredFields()) {
+                    for (Field f2 : Extractor.getAllFields(relEntity.getClass())) {
                         if (f2.isAnnotationPresent(Id.class)) {
 
                             Object id = accessor.getPropertyValue(f2.getName());
@@ -167,21 +169,10 @@ public class ChasisResource<T, E extends Serializable, R> {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
 
-        try {
-            accessor.setPropertyValue("actionStatus", AppConstants.STATUS_UNAPPROVED);
-        } catch (org.springframework.beans.NotWritablePropertyException ex) {
-            log.debug("Field actionStatus on entity {} is not accessible skipping field", this.genericClasses.get(0));
-        }
-        try {
-            accessor.setPropertyValue("action", AppConstants.ACTIVITY_CREATE);
-        } catch (org.springframework.beans.NotWritablePropertyException ex) {
-            log.debug("Field action on entity {} is not accessible skipping field", this.genericClasses.get(0));
-        }
-        try {
-            accessor.setPropertyValue("intrash", AppConstants.NO);
-        } catch (org.springframework.beans.NotWritablePropertyException ex) {
-            log.debug("Field action on entity {} is not accessible skipping field", this.genericClasses.get(0));
-        }
+        t.setAction(MakerCheckerAction.CREATE);
+
+        t.setActionStatus(MakerCheckerActionStatus.UNAPPROVED);
+
         entityManager.persist(t);
 
 
@@ -192,22 +183,6 @@ public class ChasisResource<T, E extends Serializable, R> {
         response.setData(t);
         response.setCode(201);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    private String getUUID() throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        MessageDigest salt = MessageDigest.getInstance("SHA-256");
-        salt.update(UUID.randomUUID().toString().getBytes("UTF-8"));
-        return bytesToHex(salt.digest());
-    }
-
-    private String bytesToHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars).toLowerCase();
     }
 
     /**
@@ -262,8 +237,7 @@ public class ChasisResource<T, E extends Serializable, R> {
         ResponseWrapper<T> response = new ResponseWrapper();
         String beforeAndAfter = "";
 
-
-        T dbT = this.fetchEntity((Serializable) SharedMethods.getEntityIdValue(t));
+        T dbT = this.fetchEntity(t.getId());
         beforeAndAfter += supportRepo.getBeforeAndAfterValues(dbT, t);
         if (dbT == null) {
             loggerService.log("Updating " + recordName + " failed due to record doesn't exist", t.getClass().getSimpleName(),
@@ -282,38 +256,25 @@ public class ChasisResource<T, E extends Serializable, R> {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
 
-        PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(dbT);
-        String actionStatus = null;
-        String action = null;
-        try {
-            actionStatus = (String) accessor.getPropertyValue("actionStatus");
-        } catch (org.springframework.beans.NotWritablePropertyException ex) {
-            log.debug("Field actionStatus on entity {} is not accessible skipping field", this.genericClasses.get(0));
-        }
-        try {
-            action = (String) accessor.getPropertyValue("action");
-        } catch (org.springframework.beans.NotWritablePropertyException ex) {
-            log.debug("Field action on entity {} is not accessible skipping field", this.genericClasses.get(0));
-        }
-        if (action != null && actionStatus != null) {
-            if ((AppConstants.STATUS_UNAPPROVED).equalsIgnoreCase(actionStatus) && ((action.equalsIgnoreCase(AppConstants.ACTIVITY_CREATE) || action.equalsIgnoreCase(AppConstants.ACTIVITY_UPDATE)))) {
-                loggerService.log("Updating " + recordName + " failed due to record has unapproved actions",
-                        t.getClass().getSimpleName(), SharedMethods.getEntityIdValue(t),
-                        AppConstants.ACTIVITY_CREATE, AppConstants.STATUS_FAILED, "");
-                response.setCode(HttpStatus.EXPECTATION_FAILED.value());
-                response.setMessage("Sorry record has Unapproved actions");
-                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(response);
-            }
-
-            if (!(AppConstants.STATUS_UNAPPROVED).equalsIgnoreCase(actionStatus)) {
-                accessor.setPropertyValue("action", AppConstants.ACTIVITY_UPDATE);
-                accessor.setPropertyValue("actionStatus", AppConstants.STATUS_UNAPPROVED);
-            }
+        if (dbT.getActionStatus() == MakerCheckerActionStatus.UNAPPROVED && (dbT.getAction() == MakerCheckerAction.CREATE || dbT.getAction() == MakerCheckerAction.UPDATE)) {
+            loggerService.log("Updating " + recordName + " failed due to record has unapproved actions",
+                    t.getClass().getSimpleName(), SharedMethods.getEntityIdValue(t),
+                    AppConstants.ACTIVITY_CREATE, AppConstants.STATUS_FAILED, "");
+            response.setCode(HttpStatus.EXPECTATION_FAILED.value());
+            response.setMessage("Sorry record has Unapproved actions");
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(response);
         }
 
+        if (dbT.getActionStatus() != MakerCheckerActionStatus.UNAPPROVED) {
+            dbT.setAction(MakerCheckerAction.UPDATE);
+            dbT.setActionStatus(MakerCheckerActionStatus.UNAPPROVED);
+        }
+
+        t.setUpdateTs(new Date());
         List<String> changes;
-        if (AppConstants.ACTIVITY_CREATE.equalsIgnoreCase(action) && AppConstants.STATUS_UNAPPROVED.equalsIgnoreCase(actionStatus)) {
+        if (dbT.getAction() == MakerCheckerAction.CREATE && dbT.getActionStatus() == MakerCheckerActionStatus.UNAPPROVED) {
             changes = supportRepo.fetchChanges(t, dbT);
+
             t = supportRepo.updateEdit(t, dbT);
         } else {
             this.entityManager.merge(dbT);
@@ -373,16 +334,18 @@ public class ChasisResource<T, E extends Serializable, R> {
                 continue;
             }
 
-            PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(t);
             try {
-                if ((accessor.getPropertyValue("actionStatus") != null) && accessor.getPropertyValue("actionStatus").toString().equalsIgnoreCase(AppConstants.STATUS_UNAPPROVED)) {
+                if (t.getActionStatus() == MakerCheckerActionStatus.UNAPPROVED) {
                     loggerService.log("Failed to delete " + recordName + ". Record has unapproved actions",
                             t.getClass().getSimpleName(), id, AppConstants.ACTIVITY_DELETE, AppConstants.STATUS_FAILED, "");
                     errors.add("Record has unapproved actions");
                 } else {
-                    accessor.setPropertyValue("action", AppConstants.ACTIVITY_DELETE);
-                    accessor.setPropertyValue("actionStatus", AppConstants.STATUS_UNAPPROVED);
-//                    this.entityManager.persist(t);
+                    t.setAction(MakerCheckerAction.DELETE);
+                    t.setActionStatus(MakerCheckerActionStatus.UNAPPROVED);
+                    t.setDeleteTs(new Date());
+                    t.setUpdateTs(new Date());
+
+                    this.entityManager.persist(t);
                     String extra = this.getLogsExtraDescription(t);
                     loggerService.log("Deleted " + recordName + " successfully." + extra, this.genericClasses.get(0).getSimpleName(),
                             id, AppConstants.ACTIVITY_DELETE, AppConstants.STATUS_COMPLETED, "");
@@ -391,7 +354,7 @@ public class ChasisResource<T, E extends Serializable, R> {
                 log.debug("Failed to find action and action status failed skipping "
                         + "updating action status proceeding to flag intrash field");
                 try {
-                    accessor.setPropertyValue("intrash", AppConstants.YES);
+                    t.setDeleteTs(new Date());
                 } catch (org.springframework.beans.NotWritablePropertyException ex) {
                     log.warn("Failed to locate intrash field deleting the object permanently");
                     this.entityManager.remove(t);
@@ -446,47 +409,27 @@ public class ChasisResource<T, E extends Serializable, R> {
                     continue;
                 }
 
-                PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(t);
-                String action;
-                String actionStatus;
-                try {
-                    if (accessor.getPropertyValue("action") == null) {
-                        log.warn("action is null on entity {} assigning empty string", t);
-                        action = "";
-                    } else {
-                        action = accessor.getPropertyValue("action").toString();
-                    }
-                    if (accessor.getPropertyValue("actionStatus") == null) {
-                        log.warn("actionStatus is null on entity {} assigning empty string", t);
-                        actionStatus = "";
-                    } else {
-                        actionStatus = accessor.getPropertyValue("actionStatus").toString();
-                    }
-                } catch (org.springframework.beans.NotWritablePropertyException ex) {
-                    throw new ExpectationFailed("Sorry entity does not contain action and actionStatus fields");
-                }
-
-                if (loggerService.isInitiator(this.genericClasses.get(0).getSimpleName(), id, action) && !action.equalsIgnoreCase("Unconfirmed")) {
+                if (loggerService.isInitiator(this.genericClasses.get(0).getSimpleName(), id, t.getAction().toString()) && t.getActionStatus() != MakerCheckerActionStatus.UNCONFIRMED) {
                     errors.add("Sorry failed to approve " + recordName + ". Maker can't approve their own record ");
                     loggerService.log("Failed to approve " + recordName + ". Maker can't approve their own record",
                             SharedMethods.getEntityName(this.genericClasses.get(0)), id, AppConstants.ACTIVITY_APPROVE, AppConstants.STATUS_FAILED, actions.getNotes());
                     continue;
-                } else if (action.equalsIgnoreCase(AppConstants.ACTIVITY_CREATE)
-                        && actionStatus.equalsIgnoreCase(AppConstants.STATUS_UNAPPROVED)) {//process new record
+                } else if (t.getAction() == MakerCheckerAction.CREATE
+                        && t.getActionStatus() == MakerCheckerActionStatus.UNAPPROVED) {//process new record
                     this.processApproveNew(id, t, actions.getNotes(), recordName);
-                    accessor.setPropertyValue("actionStatus", AppConstants.STATUS_APPROVED);
-                } else if (action.equalsIgnoreCase(AppConstants.ACTIVITY_UPDATE)
-                        && actionStatus.equalsIgnoreCase(AppConstants.STATUS_UNAPPROVED)) {//process updated record
+                    t.setActionStatus(MakerCheckerActionStatus.APPROVED);
+                } else if (t.getAction() == MakerCheckerAction.UPDATE
+                        && t.getActionStatus() == MakerCheckerActionStatus.UNAPPROVED) {//process updated record
                     this.processApproveChanges(id, t, actions.getNotes(), recordName);
-                    accessor.setPropertyValue("actionStatus", AppConstants.STATUS_APPROVED);
-                } else if (action.equalsIgnoreCase(AppConstants.ACTIVITY_DELETE)
-                        && actionStatus.equalsIgnoreCase(AppConstants.STATUS_UNAPPROVED)) {
+                    t.setActionStatus(MakerCheckerActionStatus.APPROVED);
+                } else if (t.getAction() == MakerCheckerAction.DELETE
+                        && t.getActionStatus() == MakerCheckerActionStatus.UNAPPROVED) {
                     this.processApproveDeletion(id, t, actions.getNotes(), recordName);
-                    accessor.setPropertyValue("actionStatus", AppConstants.STATUS_APPROVED);
-                } else if (action.equalsIgnoreCase(AppConstants.ACTIVITY_CREATE)
-                        && actionStatus.equalsIgnoreCase(AppConstants.STATUS_UNCONFIRMED)) {
+                    t.setActionStatus(MakerCheckerActionStatus.APPROVED);
+                } else if (t.getAction() == MakerCheckerAction.CREATE
+                        && t.getActionStatus() == MakerCheckerActionStatus.UNCONFIRMED) {
                     this.processConfirm(id, t, actions.getNotes(), recordName);
-                    accessor.setPropertyValue("actionStatus", AppConstants.STATUS_UNAPPROVED);
+                    t.setActionStatus(MakerCheckerActionStatus.UNAPPROVED);
                 } else {
                     loggerService.log("Failed to approve " + recordName + ". Record doesn't have approve actions",
                             this.genericClasses.get(0).getSimpleName(), id, AppConstants.ACTIVITY_APPROVE, AppConstants.STATUS_FAILED, actions.getNotes());
@@ -536,8 +479,7 @@ public class ChasisResource<T, E extends Serializable, R> {
 
 
     protected void processApproveDeletion(E id, T entity, String notes, String nickName) throws ExpectationFailed {
-        PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(entity);
-        accessor.setPropertyValue("intrash", AppConstants.YES);
+        entity.setDeleteTs(new Date());
         String extra = this.getLogsExtraDescription(entity);
         loggerService.log("Done approving " + nickName + " deletion " + extra,
                 entity.getClass().getSimpleName(), id, AppConstants.ACTIVITY_APPROVE, AppConstants.STATUS_COMPLETED, notes);
@@ -583,55 +525,33 @@ public class ChasisResource<T, E extends Serializable, R> {
                     continue;
                 }
 
-                PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(t);
-                String action;
-                String actionStatus;
-                try {
-                    if (accessor.getPropertyValue("action") == null) {
-                        log.warn("action is null on entity {} assigning empty string", t);
-                        action = "";
-                    } else {
-                        action = accessor.getPropertyValue("action").toString();
-                    }
-                    if (accessor.getPropertyValue("actionStatus") == null) {
-                        log.warn("actionStatus is null on entity {} assigning empty string", t);
-                        actionStatus = "";
-                    } else {
-                        actionStatus = accessor.getPropertyValue("actionStatus").toString();
-                    }
-                } catch (org.springframework.beans.NotWritablePropertyException ex) {
-                    throw new ExpectationFailed("Sorry entity does not contain action and actionStatus fields");
-                }
-
-                if (loggerService.isInitiator(clazz.getSimpleName(), id, action) && !action.equalsIgnoreCase("Unconfirmed")) {
+                if (loggerService.isInitiator(clazz.getSimpleName(), id, t.getAction().toString()) && t.getActionStatus() != MakerCheckerActionStatus.UNCONFIRMED) {
                     errors.add("Sorry maker can't approve their own record ");
                     loggerService.log("Failed to approve " + recordName + ". Maker can't approve their own record",
                             SharedMethods.getEntityName(clazz), id, AppConstants.ACTIVITY_APPROVE, AppConstants.STATUS_FAILED, actions.getNotes());
                     continue;
-                } else if (action.equalsIgnoreCase(AppConstants.ACTIVITY_CREATE)
-                        && actionStatus.equalsIgnoreCase(AppConstants.STATUS_UNAPPROVED)) {//process new record
+                } else if (t.getAction() == MakerCheckerAction.CREATE
+                        && t.getActionStatus() == MakerCheckerActionStatus.UNAPPROVED) {//process new record
                     this.processDeclineNew(id, t, actions.getNotes(), recordName);
-                    accessor.setPropertyValue("actionStatus", AppConstants.STATUS_DECLINED);
-                    try {
-                        accessor.setPropertyValue("intrash", AppConstants.YES);
-                    } catch (org.springframework.beans.NotWritablePropertyException ex) {
-                        log.warn("Failed to locate intrash field deleting the object permanently");
-                        this.entityManager.remove(t);
-                        this.entityManager.flush();
-                    }
-                } else if (action.equalsIgnoreCase(AppConstants.ACTIVITY_UPDATE)
-                        && actionStatus.equalsIgnoreCase(AppConstants.STATUS_UNAPPROVED)) {//process updated record
+                    t.setActionStatus(MakerCheckerActionStatus.DECLINED);
+
+                    t.setDeleteTs(new Date());
+
+                } else if (t.getAction() == MakerCheckerAction.UPDATE
+                        && t.getActionStatus() == MakerCheckerActionStatus.UNAPPROVED) {//process updated record
                     this.processDeclineChanges(id, t, actions.getNotes(), recordName);
-                    accessor.setPropertyValue("actionStatus", AppConstants.STATUS_DECLINED);
-                } else if (action.equalsIgnoreCase(AppConstants.ACTIVITY_DELETE)
-                        && actionStatus.equalsIgnoreCase(AppConstants.STATUS_UNAPPROVED)) {
+
+                    t.setActionStatus(MakerCheckerActionStatus.DECLINED);
+
+                } else if (t.getAction() == MakerCheckerAction.DELETE
+                        && t.getActionStatus() == MakerCheckerActionStatus.UNAPPROVED) {
                     this.processDeclineDeletion(id, t, actions.getNotes(), recordName);
-                    accessor.setPropertyValue("actionStatus", AppConstants.STATUS_DECLINED);
-                } else if (action.equalsIgnoreCase(AppConstants.ACTIVITY_CREATE)
-                        && actionStatus.equalsIgnoreCase(AppConstants.STATUS_UNCONFIRMED)) {
+                    t.setActionStatus(MakerCheckerActionStatus.DECLINED);
+                } else if (t.getAction() == MakerCheckerAction.CREATE
+                        && t.getActionStatus() == MakerCheckerActionStatus.UNCONFIRMED) {
                     this.processDeclineConfirmation(id, t, actions.getNotes(), recordName);
-                    accessor.setPropertyValue("intrash", AppConstants.YES);
-                    accessor.setPropertyValue("actionStatus", AppConstants.STATUS_DECLINED);
+                    t.setDeleteTs(new Date());
+                    t.setActionStatus(MakerCheckerActionStatus.DECLINED);
                 } else {
                     loggerService.log("Failed to decline " + recordName + ". Record doesn't have approve actions",
                             clazz.getSimpleName(), id, AppConstants.ACTIVITY_APPROVE, AppConstants.STATUS_FAILED, actions.getNotes());
@@ -761,30 +681,22 @@ public class ChasisResource<T, E extends Serializable, R> {
 
         //Declare properties
         PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(t);
-        Class clazz = SharedMethods.getGenericClasses(this.getClass()).get(0);
-        String fieldId = null;
-        E id = null;
-        boolean hasIntrash = false;
+        //Class clazz = SharedMethods.getGenericClasses(this.getClass()).get(0);
+        //System.out.println("Validation; Chasis class: " + clazz);
+
+        Class<T> clazz = (Class<T>) t.getClass(); //This line and the previous should produce the same thing
+
+        String fieldId = "id";
+        String id = t.getId();
         List<Field> uniqueFields = new ArrayList<>();
         CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
 
         //Retrieve annotated fields and values
-        for (Field field : t.getClass().getDeclaredFields()) {
+        for (Field field : Extractor.getAllFields(t.getClass())) {
             if (field.isAnnotationPresent(Unique.class)) {
                 uniqueFields.add(field);
             }
-            if (field.isAnnotationPresent(Id.class)) {
-                fieldId = field.getName();
-                id = (E) accessor.getPropertyValue(field.getName());
-            }
-            if (field.getName().equalsIgnoreCase("intrash")) {
-                hasIntrash = true;
-            }
-        }
 
-        //check if id field is present
-        if (fieldId == null) {
-            throw new RuntimeException("Failed to validate unique fields. Entity doesn't have an id field");
         }
 
         //validate unique fields
@@ -794,21 +706,14 @@ public class ChasisResource<T, E extends Serializable, R> {
             Unique unique = field.getDeclaredAnnotation(Unique.class);
             Object value = accessor.getPropertyValue(field.getName());
 
-            if (hasIntrash) {
-                if (id == null) {
-                    criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.and(criteriaBuilder.equal(root.get(field.getName()), value),
-                            criteriaBuilder.equal(root.get("intrash"), AppConstants.NO))));
-                } else {
-                    criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.and(criteriaBuilder.equal(root.get(field.getName()), value),
-                            criteriaBuilder.equal(root.get("intrash"), AppConstants.NO)), criteriaBuilder.notEqual(root.get(fieldId), id)));
-                }
+            if (id == null) {
+                criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.and(criteriaBuilder.equal(root.get(field.getName()), value),
+                        criteriaBuilder.isNull(root.get("deleteTs")))));
             } else {
-                if (id == null) {
-                    criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(root.get(field.getName()), value)));
-                } else {
-                    criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(root.get(field.getName()), value), criteriaBuilder.notEqual(root.get(fieldId), id)));
-                }
+                criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.and(criteriaBuilder.equal(root.get(field.getName()), value),
+                        criteriaBuilder.isNull(root.get("deleteTs"))), criteriaBuilder.notEqual(root.get(fieldId), id)));
             }
+
             if (!this.entityManager.createQuery(criteriaQuery).getResultList().isEmpty()) {
                 throw new GeneralBadRequest("Record with similar " + unique.fieldName() + " exists");
             }
@@ -822,32 +727,22 @@ public class ChasisResource<T, E extends Serializable, R> {
      * return
      */
     public T fetchEntity(Serializable id) {
-        Class clazz = this.genericClasses.get(0);//Shar.getGenericClasses(this.getClass()).get(0);
-        //get id field name
-        String fieldId = null;
-        boolean hasIntrash = false;
-        for (Field field : clazz.getDeclaredFields()) {
-            if (field.isAnnotationPresent(Id.class)) {
-                fieldId = field.getName();
-            }
-            if (field.getName().equalsIgnoreCase("intrash")) {
-                hasIntrash = true;
-            }
-        }
-
-        if (fieldId == null) {
-            throw new RuntimeException("Entity doesn't have an id field");
-        }
+        Class<T> clazz = (Class<T>) this.genericClasses.get(0);//Shar.getGenericClasses(this.getClass()).get(0);
 
         CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(clazz);
         Root<T> root = criteriaQuery.from(clazz);
-        if (hasIntrash) {
+
+
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(root.get("id"), id),
+                criteriaBuilder.isNull(root.get("deleteTs"))));
+
+        /*if (hasIntrash) {
             criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(root.get(fieldId), id),
                     criteriaBuilder.equal(root.get("intrash"), AppConstants.NO)));
         } else {
             criteriaQuery.where(criteriaBuilder.equal(root.get(fieldId), id));
-        }
+        }*/
         try {
             return this.entityManager.createQuery(criteriaQuery).getSingleResult();
         } catch (javax.persistence.NoResultException ex) {
@@ -874,7 +769,7 @@ public class ChasisResource<T, E extends Serializable, R> {
     })
     @GetMapping
     public ResponseEntity<ResponseWrapper<Page<T>>> findAll(Pageable pg, HttpServletRequest request) throws ParseException {
-        return fetchAllData(pg, request, AppConstants.NO);
+        return fetchAllData(pg, request, false);
     }
 
 
@@ -897,10 +792,10 @@ public class ChasisResource<T, E extends Serializable, R> {
     })
     @GetMapping(value = "/deleted")
     public ResponseEntity<ResponseWrapper<Page<T>>> findAllDeleted(Pageable pg, HttpServletRequest request) throws ParseException {
-        return fetchAllData(pg, request, AppConstants.YES);
+        return fetchAllData(pg, request, true);
     }
 
-    private ResponseEntity<ResponseWrapper<Page<T>>> fetchAllData(Pageable pg, HttpServletRequest request, String intrash) throws ParseException {
+    private ResponseEntity<ResponseWrapper<Page<T>>> fetchAllData(Pageable pg, HttpServletRequest request, boolean inTrash) throws ParseException {
         ResponseWrapper response = new ResponseWrapper();
         CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(this.genericClasses.get(0));
@@ -913,7 +808,7 @@ public class ChasisResource<T, E extends Serializable, R> {
         Calendar cal = Calendar.getInstance();
 
         //retrieve filter and search params
-        for (Field field : this.genericClasses.get(0).getDeclaredFields()) {
+        for (Field field : Extractor.getAllFields(this.genericClasses.get(0))) {
             if (field.isAnnotationPresent(Searchable.class) && request.getParameter("needle") != null) { //process search attributes
                 searchPreds.add(criteriaBuilder.like(criteriaBuilder.upper(root.get(field.getName())),
                         "%" + request.getParameter("needle").toUpperCase() + "%"));
@@ -974,8 +869,10 @@ public class ChasisResource<T, E extends Serializable, R> {
                 }
             }
             //check if is intrash
-            if (field.getName().equalsIgnoreCase("intrash")) {
-                filterPreds.add(criteriaBuilder.equal(root.get(field.getName()), intrash));
+            if (inTrash) {
+                filterPreds.add(criteriaBuilder.isNotNull(root.get("deleteTs")));
+            }else{
+                filterPreds.add(criteriaBuilder.isNull(root.get("deleteTs")));
             }
 
             if (field.isAnnotationPresent(TreeRoot.class)) {
@@ -1022,7 +919,7 @@ public class ChasisResource<T, E extends Serializable, R> {
         if (t == null) return "";
 
         PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(t);
-        for (Field field : t.getClass().getDeclaredFields()) {
+        for (Field field : Extractor.getAllFields(t.getClass())) {
             if (field.isAnnotationPresent(EntityName.class)) {
                 entityName = accessor.getPropertyValue(field.getName());
                 name = field.getName();

@@ -20,16 +20,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5b7d5820-f293-4db7-a9f9-1939292b5f9c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/sonarIssues.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarIssues.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity/base/BaseNumberEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity/base/BaseUuidEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity/base/Entity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity/base/EntityInstance.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity/base/EnumClass.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity/base/StandardEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity/base/StandardNumberEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity/enums/MakerCheckerAction.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity/enums/MakerCheckerActionStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity/interfaces/Creatable.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity/interfaces/MakerChecker.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity/interfaces/SoftDelete.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity/interfaces/Updatable.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity/interfaces/Versioned.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/utils/Extractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/utils/UuidProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/annotations/ModifiableQueryField.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/annotations/ModifiableQueryField.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/ChasisResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/ChasisResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/utils/SharedMethods.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/utils/SharedMethods.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/utils/SupportRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ke/axle/chassis/utils/SupportRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/SpringResourceChasis-1.4.1-javadoc.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/SpringResourceChasis-1.4.1-sources.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/SpringResourceChasis-1.4.1.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/apidocs/allclasses-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/allclasses-index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/apidocs/allclasses.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/allclasses.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/apidocs/allpackages-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/allpackages-index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/cm/projects/spring/resource/chasis/Nerd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/cm/projects/spring/resource/chasis/Nerd.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/apidocs/constant-values.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/constant-values.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/apidocs/deprecated-list.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/deprecated-list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/apidocs/help-doc.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/help-doc.html" afterDir="false" />
@@ -107,17 +119,22 @@
       <change beforePath="$PROJECT_DIR$/target/apidocs/ke/axle/chassis/wrappers/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/ke/axle/chassis/wrappers/package-summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/apidocs/ke/axle/chassis/wrappers/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/ke/axle/chassis/wrappers/package-tree.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/apidocs/ke/axle/chassis/wrappers/package-use.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/ke/axle/chassis/wrappers/package-use.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/apidocs/member-search-index.zip" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/member-search-index.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/apidocs/overview-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/overview-summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/apidocs/overview-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/overview-tree.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/apidocs/package-search-index.zip" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/package-search-index.zip" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/apidocs/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/script.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/apidocs/serialized-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/serialized-form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/apidocs/type-search-index.zip" beforeDir="false" afterPath="$PROJECT_DIR$/target/apidocs/type-search-index.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/checkout" beforeDir="false" afterPath="$PROJECT_DIR$/target/checkout" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/ke/axle/chassis/ChasisResource$ExcludeProxiedFields.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/ke/axle/chassis/ChasisResource$ExcludeProxiedFields.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/ke/axle/chassis/ChasisResource.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/ke/axle/chassis/ChasisResource.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/ke/axle/chassis/annotations/ModifiableQueryField.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/ke/axle/chassis/annotations/ModifiableQueryField.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/ke/axle/chassis/utils/SharedMethods.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/ke/axle/chassis/utils/SharedMethods.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/ke/axle/chassis/utils/SupportRepository$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/ke/axle/chassis/utils/SupportRepository$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/ke/axle/chassis/utils/SupportRepository$DynamicMixIn.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/ke/axle/chassis/utils/SupportRepository$DynamicMixIn.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/ke/axle/chassis/utils/SupportRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/ke/axle/chassis/utils/SupportRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/javadoc-bundle-options/package-list" beforeDir="false" afterPath="$PROJECT_DIR$/target/javadoc-bundle-options/package-list" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/test-classes/com/cm/projects/spring/resource/chasis/EdittedRecord.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/cm/projects/spring/resource/chasis/EdittedRecord.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,6 +152,8 @@
       <list>
         <option value="AnnotationType" />
         <option value="Class" />
+        <option value="Enum" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
@@ -165,7 +184,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../TMS/tmsgateway" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -177,6 +196,14 @@
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="ke.axle.chassis.utils" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/java/ke/axle/chassis/entity" />
+    </key>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -237,6 +264,8 @@
       <workItem from="1594969514137" duration="3490000" />
       <workItem from="1594984851132" duration="2814000" />
       <workItem from="1595123123314" duration="2724000" />
+      <workItem from="1595698947731" duration="7024000" />
+      <workItem from="1595714159154" duration="10132000" />
     </task>
     <task id="LOCAL-00001" summary="Group ID Update">
       <created>1561463845702</created>
@@ -340,19 +369,20 @@
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="2" />
+    <option name="version" value="1" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
@@ -370,10 +400,11 @@
     <option name="LAST_COMMIT_MESSAGE" value="Version Update" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="765" y="196" key="#com.intellij.ide.util.MemberChooser" timestamp="1594917039359">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state x="2131" y="204" width="374" height="582" key="#com.intellij.ide.util.MemberChooser" timestamp="1595716549764">
+      <screen x="1366" y="0" width="1920" height="1080" />
     </state>
     <state x="765" y="196" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1594917039359" />
+    <state x="2131" y="204" width="374" height="582" key="#com.intellij.ide.util.MemberChooser/0.312.1366.768/1366.0.1920.1080@1366.0.1920.1080" timestamp="1595716549764" />
     <state x="725" y="357" key="#com.intellij.refactoring.move.moveInstanceMethod.MoveInstanceMethodDialog" timestamp="1594969713428">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -382,26 +413,38 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1588885349688" />
-    <state width="1876" height="257" key="GridCell.Tab.0.bottom" timestamp="1594977107892">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state width="1878" height="206" key="GridCell.Tab.0.bottom" timestamp="1595723997142">
+      <screen x="1366" y="0" width="1920" height="1080" />
     </state>
     <state width="1876" height="257" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1594977107892" />
-    <state width="1876" height="257" key="GridCell.Tab.0.center" timestamp="1594977107892">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state width="1878" height="632" key="GridCell.Tab.0.bottom/0.25.3286.1025@0.25.3286.1025" timestamp="1595713169449" />
+    <state width="1878" height="206" key="GridCell.Tab.0.bottom/0.312.1366.768/1366.0.1920.1080@1366.0.1920.1080" timestamp="1595723997142" />
+    <state width="1878" height="206" key="GridCell.Tab.0.center" timestamp="1595723997142">
+      <screen x="1366" y="0" width="1920" height="1080" />
     </state>
     <state width="1876" height="257" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1594977107892" />
-    <state width="1876" height="257" key="GridCell.Tab.0.left" timestamp="1594977107892">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state width="1878" height="632" key="GridCell.Tab.0.center/0.25.3286.1025@0.25.3286.1025" timestamp="1595713169448" />
+    <state width="1878" height="206" key="GridCell.Tab.0.center/0.312.1366.768/1366.0.1920.1080@1366.0.1920.1080" timestamp="1595723997142" />
+    <state width="1878" height="206" key="GridCell.Tab.0.left" timestamp="1595723997141">
+      <screen x="1366" y="0" width="1920" height="1080" />
     </state>
     <state width="1876" height="257" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1594977107892" />
-    <state width="1876" height="257" key="GridCell.Tab.0.right" timestamp="1594977107892">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state width="1878" height="632" key="GridCell.Tab.0.left/0.25.3286.1025@0.25.3286.1025" timestamp="1595713169448" />
+    <state width="1878" height="206" key="GridCell.Tab.0.left/0.312.1366.768/1366.0.1920.1080@1366.0.1920.1080" timestamp="1595723997141" />
+    <state width="1878" height="206" key="GridCell.Tab.0.right" timestamp="1595723997142">
+      <screen x="1366" y="0" width="1920" height="1080" />
     </state>
     <state width="1876" height="257" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1594977107892" />
+    <state width="1878" height="632" key="GridCell.Tab.0.right/0.25.3286.1025@0.25.3286.1025" timestamp="1595713169449" />
+    <state width="1878" height="206" key="GridCell.Tab.0.right/0.312.1366.768/1366.0.1920.1080@1366.0.1920.1080" timestamp="1595723997142" />
     <state x="552" y="249" key="Vcs.Push.Dialog.v2" timestamp="1594977080656">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="552" y="249" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1594977080656" />
+    <state x="1466" y="125" width="1720" height="825" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1595720211465">
+      <screen x="1366" y="0" width="1920" height="1080" />
+    </state>
+    <state x="1466" y="125" width="1720" height="825" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.312.1366.768/1366.0.1920.1080@1366.0.1920.1080" timestamp="1595720211465" />
     <state x="616" y="173" width="672" height="676" key="search.everywhere.popup" timestamp="1594897452183">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

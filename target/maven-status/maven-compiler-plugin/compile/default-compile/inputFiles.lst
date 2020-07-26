@@ -1,27 +1,43 @@
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\exceptions\GeneralBadRequest.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\utils\AppConstants.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\exceptions\ExpectationFailed.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\annotations\EditDataWrapper.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\annotations\ModifiableQueryField.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\annotations\TreeRoot.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\annotations\Unique.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\annotations\Filter.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\annotations\ModifiableField.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\annotations\NickName.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\annotations\EditEntity.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\utils\SupportRepository.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\annotations\EntityName.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\annotations\EditChildEntity.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\utils\LoggerService.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\wrappers\ConstantsWrapper.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\enums\ModifiableFieldType.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\ChasisResource.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\annotations\EditEntityId.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\utils\ErrorList.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\annotations\Searchable.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\wrappers\ResponseWrapper.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\annotations\ModifiableChildEntityField.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\utils\SharedMethods.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\wrappers\ActionWrapper.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\annotations\ChasisUUID.java
-D:\workspace\libraries\spring-crud-chassis\src\main\java\ke\axle\chassis\exceptions\NotFoundException.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/wrappers/ActionWrapper.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/entity/base/Entity.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/entity/enums/MakerCheckerActionStatus.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/annotations/Filter.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/entity/base/StandardNumberEntity.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/annotations/TreeRoot.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/entity/base/BaseUuidEntity.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/annotations/ChasisUUID.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/wrappers/ResponseWrapper.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/exceptions/NotFoundException.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/utils/Extractor.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/wrappers/ConstantsWrapper.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/entity/interfaces/MakerChecker.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/entity/interfaces/Creatable.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/entity/interfaces/Versioned.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/entity/enums/MakerCheckerAction.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/exceptions/GeneralBadRequest.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/utils/UuidProvider.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/annotations/ModifiableChildEntityField.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/entity/base/EnumClass.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/annotations/EditChildEntity.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/utils/ErrorList.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/entity/interfaces/SoftDelete.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/utils/SupportRepository.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/annotations/EditDataWrapper.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/entity/base/StandardEntity.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/utils/AppConstants.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/exceptions/ExpectationFailed.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/utils/LoggerService.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/enums/ModifiableFieldType.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/entity/base/EntityInstance.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/annotations/EditEntity.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/entity/interfaces/Updatable.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/annotations/ModifiableField.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/ChasisResource.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/utils/SharedMethods.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/annotations/Unique.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/annotations/ModifiableQueryField.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/annotations/EntityName.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/entity/base/BaseNumberEntity.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/annotations/EditEntityId.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/annotations/Searchable.java
+/run/media/kshem/Local Disk/20percent_projects/axle-chassis/src/main/java/ke/axle/chassis/annotations/NickName.java

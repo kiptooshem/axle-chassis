@@ -15,16 +15,16 @@ import java.util.Date;
 public class StandardEntity extends BaseUuidEntity implements Versioned, Creatable, Updatable, SoftDelete, MakerChecker {
 
     @Column(name = "VERSION")
-    protected Integer version;
+    protected Integer version = 1;
 
     @Column(name = "CREATE_TS")
-    protected Date createTs;
+    protected Date createTs = new Date();
 
     @Column(name = "CREATED_BY")
     protected String createdBy;
 
     @Column(name = "UPDATE_TS")
-    protected Date updateTs;
+    protected Date updateTs = new Date();
 
     @Column(name = "UPDATED_BY")
     protected String updatedBy;

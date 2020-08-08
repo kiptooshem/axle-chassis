@@ -15,6 +15,7 @@ import ke.axle.chassis.entity.enums.MakerCheckerAction;
 import ke.axle.chassis.entity.enums.MakerCheckerActionStatus;
 import ke.axle.chassis.exceptions.ExpectationFailed;
 import ke.axle.chassis.exceptions.GeneralBadRequest;
+import ke.axle.chassis.service.CreateEntityService;
 import ke.axle.chassis.utils.*;
 import ke.axle.chassis.wrappers.ActionWrapper;
 import ke.axle.chassis.wrappers.ResponseWrapper;
@@ -24,6 +25,7 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.PropertyAccessor;
 import org.springframework.beans.PropertyAccessorFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,6 +33,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,6 +67,8 @@ import java.util.*;
  * @author Owori Juma
  * @version 1.2.3
  */
+
+@Component
 public class ChasisResource<T extends StandardEntity, E extends Serializable, R> {
 
     /**
@@ -83,6 +88,9 @@ public class ChasisResource<T extends StandardEntity, E extends Serializable, R>
 
     private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
+    @Autowired
+    private CreateEntityService createEntityService;
+
     /**
      *
      */
@@ -95,7 +103,8 @@ public class ChasisResource<T extends StandardEntity, E extends Serializable, R>
     public ChasisResource(LoggerService loggerService, EntityManager entityManager) {
         this.loggerService = loggerService;
         this.entityManager = entityManager;
-        this.genericClasses = SharedMethods.getGenericClasses(this.getClass());
+        //this.genericClasses = SharedMethods.getGenericClasses(this.getClass());
+        this.genericClasses = Arrays.asList((Class<T>) (Class) this.getClass(),(Class<E>) (Class) this.getClass(), (Class<R>) (Class) this.getClass());
         this.supportRepo = new SupportRepository<>(entityManager, this.genericClasses.get(0), this.genericClasses.get(2));
         NickName nickName = AnnotationUtils.findAnnotation(this.genericClasses.get(0), NickName.class);
         this.recordName = (nickName == null) ? "Record" : nickName.name();
@@ -116,73 +125,21 @@ public class ChasisResource<T extends StandardEntity, E extends Serializable, R>
     @ApiOperation(value = "Create New Record")
     public ResponseEntity<ResponseWrapper<T>> create(@Valid @RequestBody T t) {
         ResponseWrapper response = new ResponseWrapper();
-        //check if relational entities exists
-        PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(t);
-        for (Field field : Extractor.getAllFields(t.getClass())) {  // Get all fields in the hierachy
-            /*if (field.isAnnotationPresent(Id.class) && !field.isAnnotationPresent(ChasisUUID.class)) {
-                accessor.setPropertyValue(field.getName(), null);
-            }
-            if (field.isAnnotationPresent(Id.class) && field.isAnnotationPresent(ChasisUUID.class)) {
-                try {
-                    accessor.setPropertyValue(field.getName(), this.getUUID());
-                } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-                    log.error("Error ", e.getCause());
-                    accessor.setPropertyValue(field.getName(), null);
-                }
-            }*/
 
-            // TODO: Check this one out
-            if (field.isAnnotationPresent(ManyToOne.class)) {
-                Object relEntity = accessor.getPropertyValue(field.getName());
-                if (relEntity != null) {
-                    for (Field f2 : Extractor.getAllFields(relEntity.getClass())) {
-                        if (f2.isAnnotationPresent(Id.class)) {
-
-                            Object id = accessor.getPropertyValue(f2.getName());
-                            if (entityManager.find(relEntity.getClass(), id) == null) {
-                                NickName nickName = relEntity.getClass().getDeclaredAnnotation(NickName.class);
-                                if (nickName != null) {
-                                    this.loggerService.log(nickName.name() + " with id " + id + " doesn't exist",
-                                            t.getClass().getSimpleName(), null, AppConstants.ACTIVITY_CREATE, AppConstants.STATUS_FAILED, "");
-                                    response.setMessage(nickName.name() + " with id " + id + " doesn't exist");
-                                } else {
-                                    this.loggerService.log("Record with id " + id + " doesn't exist",
-                                            t.getClass().getSimpleName(), null, AppConstants.ACTIVITY_CREATE, AppConstants.STATUS_FAILED, "");
-                                    response.setMessage("Record with id " + id + " doesn't exist");
-                                }
-                                response.setCode(404);
-                                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        //validate unique fields
         try {
-            this.validateUniqueFields(t);
-        } catch (GeneralBadRequest ex) {
-            loggerService.log("Updating " + recordName + " failed due to record with similar " + fieldNickname + " exists", t.getClass().getSimpleName(),
-                    null, AppConstants.ACTIVITY_CREATE, AppConstants.STATUS_FAILED, "");
-            response.setCode(HttpStatus.CONFLICT.value());
-            response.setMessage(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            t = createEntityService.create(this, t);
+
+        } catch (GeneralBadRequest generalBadRequest) {
+            generalBadRequest.printStackTrace();
+            response.setCode(generalBadRequest.getHttpStatus().value());
+            response.setMessage(generalBadRequest.getMessage());
+
+            return new ResponseEntity<>(response, generalBadRequest.getHttpStatus());
         }
 
-        t.setAction(MakerCheckerAction.CREATE);
-
-        t.setActionStatus(MakerCheckerActionStatus.UNAPPROVED);
-
-        entityManager.persist(t);
-
-
-        String extra = this.getLogsExtraDescription(t);
-        this.loggerService.log("Created " + recordName + " successfully " + extra,
-                t.getClass().getSimpleName(), SharedMethods.getEntityIdValue(t),
-                AppConstants.ACTIVITY_CREATE, AppConstants.STATUS_COMPLETED, "");
         response.setData(t);
         response.setCode(201);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     /**

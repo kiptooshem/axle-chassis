@@ -15,11 +15,8 @@ public abstract class BaseUuidEntity extends EntityInstance implements Entity<St
     @Column(name = "ID")
     protected String id;
 
-    @Transient
-    protected UUID uuid;
-
     public BaseUuidEntity(){
-        uuid = UuidProvider.createUuid();
+        UUID uuid = UuidProvider.createUuid();
         id = uuid.toString();
     }
 
@@ -31,11 +28,4 @@ public abstract class BaseUuidEntity extends EntityInstance implements Entity<St
         this.id = id;
     }
 
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
 }

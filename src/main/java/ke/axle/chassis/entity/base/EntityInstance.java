@@ -5,7 +5,6 @@ import java.io.Serializable;
 
 public abstract class EntityInstance implements Serializable {
 
-    @Transient
     protected boolean isNew = true;
 
     public boolean isNew() {

@@ -1,9 +1,13 @@
 ke.axle.chassis
 ke.axle.chassis.annotations
+ke.axle.chassis.config
 ke.axle.chassis.entity.base
 ke.axle.chassis.entity.enums
 ke.axle.chassis.entity.interfaces
 ke.axle.chassis.enums
 ke.axle.chassis.exceptions
+ke.axle.chassis.service
+ke.axle.chassis.service.beans
+ke.axle.chassis.service.listener
 ke.axle.chassis.utils
 ke.axle.chassis.wrappers

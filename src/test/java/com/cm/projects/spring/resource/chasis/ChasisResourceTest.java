@@ -94,8 +94,8 @@ public class ChasisResourceTest {
     @Test
     public void testGetEntity() {
         log.info("=============== Testing fetching resource ===============");
-        ResponseEntity<ResponseWrapper<Nerd>> res = this.nerdResource.getEntity(1L);
-        log.debug("Get entity resulted to: {}", res.getBody());
+        //ResponseEntity<ResponseWrapper<Nerd>> res = this.nerdResource.getEntity(1L);
+       // log.debug("Get entity resulted to: {}", res.getBody());
 //        assertEquals("Failed to retrieve existing resource", new Nerd(1L), res.getBody().getData());
     }
 //

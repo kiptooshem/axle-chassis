@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = "/developer")
-public class NerdResource extends ChasisResource<Nerd, Long, EdittedRecord> {
+public class NerdResource extends ChasisResource<Nerd, String, EdittedRecord> {
 
-        public NerdResource(LoggerService loggerService, EntityManager entityManager) {
-            super(loggerService, entityManager);
-        }
 
+    public NerdResource(LoggerService loggerService, EntityManager entityManager) {
+        super(loggerService, entityManager);
     }
+}

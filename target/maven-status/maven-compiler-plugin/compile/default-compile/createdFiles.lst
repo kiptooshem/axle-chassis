@@ -22,6 +22,7 @@ ke/axle/chassis/entity/base/BaseUuidEntity.class
 ke/axle/chassis/service/UpdateEntityService.class
 ke/axle/chassis/service/DeleteEntityService.class
 ke/axle/chassis/entity/base/StandardNumberEntity.class
+ke/axle/chassis/ChasisResourceHandler.class
 ke/axle/chassis/service/listener/UpdateEntityListener.class
 ke/axle/chassis/entity/base/Entity.class
 ke/axle/chassis/entity/interfaces/SoftDelete.class

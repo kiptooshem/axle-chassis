@@ -68,7 +68,6 @@ import java.util.*;
  * @version 1.2.3
  */
 
-@Component
 public class ChasisResource<T extends StandardEntity, E extends Serializable, R> {
 
     /**
@@ -88,9 +87,6 @@ public class ChasisResource<T extends StandardEntity, E extends Serializable, R>
 
     private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
-    @Autowired
-    private CreateEntityService createEntityService;
-
     /**
      *
      */
@@ -103,8 +99,7 @@ public class ChasisResource<T extends StandardEntity, E extends Serializable, R>
     public ChasisResource(LoggerService loggerService, EntityManager entityManager) {
         this.loggerService = loggerService;
         this.entityManager = entityManager;
-        //this.genericClasses = SharedMethods.getGenericClasses(this.getClass());
-        this.genericClasses = Arrays.asList((Class<T>) (Class) this.getClass(),(Class<E>) (Class) this.getClass(), (Class<R>) (Class) this.getClass());
+        this.genericClasses = SharedMethods.getGenericClasses(this.getClass());
         this.supportRepo = new SupportRepository<>(entityManager, this.genericClasses.get(0), this.genericClasses.get(2));
         NickName nickName = AnnotationUtils.findAnnotation(this.genericClasses.get(0), NickName.class);
         this.recordName = (nickName == null) ? "Record" : nickName.name();
@@ -127,7 +122,7 @@ public class ChasisResource<T extends StandardEntity, E extends Serializable, R>
         ResponseWrapper response = new ResponseWrapper();
 
         try {
-            t = createEntityService.create(this, t);
+            t = ChasisResourceHandler.createService.create(this, t);
 
         } catch (GeneralBadRequest generalBadRequest) {
             generalBadRequest.printStackTrace();
@@ -156,7 +151,7 @@ public class ChasisResource<T extends StandardEntity, E extends Serializable, R>
         String extra = this.getLogsExtraDescription(dbT);
 
         loggerService.log("Viewed " + recordName + extra,
-                this.genericClasses.get(0).getSimpleName(), id, AppConstants.ACTIVITY_VIEW, AppConstants.STATUS_COMPLETED, "");
+                dbT.getClass().getSimpleName(), id, AppConstants.ACTIVITY_VIEW, AppConstants.STATUS_COMPLETED, "");
         ResponseWrapper response = new ResponseWrapper();
         response.setData(dbT);
         return ResponseEntity.ok(response);

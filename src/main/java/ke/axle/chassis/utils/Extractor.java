@@ -32,7 +32,7 @@ public class Extractor<T> {
             fields.addAll(Arrays.asList(c.getDeclaredFields()));
         }
 
-        System.out.println("Found fields: "+ fields);
+        //System.out.println("Found fields: "+ fields);
 
         return fields;
     }

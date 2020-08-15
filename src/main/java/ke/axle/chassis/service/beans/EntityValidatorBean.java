@@ -45,6 +45,9 @@ public class EntityValidatorBean implements EntityValidator {
         String id = entity.getId();
 
         for (Field field : entityFieldManager.getUniqueFields(entity)) {
+            // TODO: This block can be refactored to use DataManager.
+            // This will make code more maintainable in the future
+
             CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(clazz);
             Root<T> root = criteriaQuery.from(clazz);
             Unique unique = field.getDeclaredAnnotation(Unique.class);

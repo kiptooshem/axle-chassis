@@ -18,14 +18,12 @@ import javax.persistence.EntityManager;
 public class CreateEntityServiceBean implements CreateEntityService {
 
     private EntityManager entityManager;
-    private EntityFieldManager entityFieldManager;
     private EntityValidator entityValidator;
 
     @Autowired
-    public CreateEntityServiceBean(EntityManager entityManager, EntityFieldManager entityFieldManager,
+    public CreateEntityServiceBean(EntityManager entityManager,
                                    EntityValidator entityValidator){
         this.entityManager = entityManager;
-        this.entityFieldManager = entityFieldManager;
         this.entityValidator = entityValidator;
     }
 

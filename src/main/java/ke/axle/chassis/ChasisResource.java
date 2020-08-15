@@ -187,7 +187,19 @@ public class ChasisResource<T extends StandardEntity, E extends Serializable, R>
     @Transactional
     public ResponseEntity<ResponseWrapper<T>> updateEntity(@RequestBody @Valid T t) throws IllegalAccessException, JsonProcessingException, ExpectationFailed {
         ResponseWrapper<T> response = new ResponseWrapper();
-        String beforeAndAfter = "";
+
+        try{
+            ChasisResourceHandler.updateService.update(this, t);
+            response.setCode(200);
+            response.setData(t);
+        }catch (GeneralBadRequest e){
+            response.setCode(e.getHttpStatus().value());
+            response.setMessage(e.getMessage());
+
+            return new ResponseEntity<>(response, e.getHttpStatus());
+        }
+
+        /*String beforeAndAfter = "";
 
         T dbT = this.fetchEntity(t.getId());
         beforeAndAfter += supportRepo.getBeforeAndAfterValues(dbT, t);
@@ -250,7 +262,7 @@ public class ChasisResource<T extends StandardEntity, E extends Serializable, R>
         loggerService.log("Updated " + recordName + " successfully. " + extra
                         + String.join(",", changes) + ". Detail Changes: " + beforeAndAfter,
                 t.getClass().getSimpleName(), SharedMethods.getEntityIdValue(t),
-                AppConstants.ACTIVITY_UPDATE, AppConstants.STATUS_COMPLETED, "");
+                AppConstants.ACTIVITY_UPDATE, AppConstants.STATUS_COMPLETED, "");*/
 
         return ResponseEntity.ok(response);
     }

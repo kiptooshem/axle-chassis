@@ -3,6 +3,7 @@ ke/axle/chassis/service/EntityValidator.class
 ke/axle/chassis/utils/Extractor.class
 ke/axle/chassis/service/listener/CreateEntityListener.class
 ke/axle/chassis/entity/enums/MakerCheckerActionStatus.class
+ke/axle/chassis/service/beans/DataManagerBean.class
 ke/axle/chassis/utils/UuidProvider.class
 ke/axle/chassis/entity/enums/MakerCheckerAction.class
 ke/axle/chassis/entity/base/BaseNumberEntity.class
@@ -28,7 +29,9 @@ ke/axle/chassis/entity/base/Entity.class
 ke/axle/chassis/entity/interfaces/SoftDelete.class
 ke/axle/chassis/entity/interfaces/Creatable.class
 ke/axle/chassis/service/EntityFieldManager.class
+ke/axle/chassis/service/beans/DataManagerBean$QueryBuilder.class
 ke/axle/chassis/entity/interfaces/Updatable.class
 ke/axle/chassis/entity/base/EnumClass.class
 ke/axle/chassis/service/beans/EntityFieldManagerBean$EntityFields.class
 ke/axle/chassis/service/beans/CreateEntityServiceBean.class
+ke/axle/chassis/service/DataManager.class
